@@ -12,7 +12,7 @@ public class Consumer{
         try{
             Thread.currentThread().sleep(2, TimeUnit.SECONDS);
         }catch(Exception e){
-            throw new MessageConsumptionException(String.format("Error occured while trying to consume message with ID: %s\n", message.getId()));
+            throw new MessageConsumptionException(String.format("Consumer %s failed while trying to consume message with ID: %s\n", consumerId, message.getId()));
         }
     }
 }

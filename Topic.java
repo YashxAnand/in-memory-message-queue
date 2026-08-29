@@ -1,13 +1,14 @@
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Topic{
     private final String topicId;
     private String topicName;
-    private ArrayList<Message> messages; // Treating index as the offset of the message and assuming we retain all the messages forever.
+    private CopyOnWriteArrayList<Message> messages; // Treating index as the offset of the message and assuming we retain all the messages forever.
 
     public Topic(String topicName){
         this.topicId = UUID.randomUUID().toString();
         this.topicName = topicName;
-        this.messages = new ArrayList<>();
+        this.messages = new CopyOnWriteArrayList<>();
     }
 
     Message getMessageAtOffset(long offset) throws OffsetNotFoundException{
