@@ -1,8 +1,9 @@
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class KafkaBroker implements IBroker{
     private final ConcurrentHashMap<String, Topic> topicMap;
-    private final ConcurrentHashMap<String, ConsumerGroup> consumerMap;
+    private final ConcurrentHashMap<String, List<ConsumerGroup> > consumerMap;
 
     public KafkaBroker(){
         this.topicMap = new ConcurrentHashMap<>();
@@ -15,15 +16,22 @@ public class KafkaBroker implements IBroker{
         Topic topic = topicMap.get(topicName);
 
         topic.addMessage(message);
+        
+        List<ConsumerGroup> consumerGroups = consumerMap.get(topicName);
+
+        for(ConsumerGroup group:consumerGroups){
+            group.addMessage(message);
+        }
     }
 
     @Override
     public void addTopic(String topicName){
-        Topic newTopic = topicMap.computeIfAbsent(topicName, (k)->new Topic(topicName));
+        topicMap.computeIfAbsent(topicName, (k)->new Topic(topicName));
+        consumerMap.computeIfAbsent(topicName, k->new CopyOnWriteArrayList<>());
     }
 
     @Override
     public void addConsumerGroup(String topicName){
-        ConsumerGroup newConsumerGroup = consumerMap.computeIfAbset(topicName, (k)->new ConsumerGroup(this, 10));
+        consumerMap.get(topicName).add(new ConsumerGroup(this, 10));
     }
 }
