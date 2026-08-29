@@ -7,4 +7,6 @@ interface IBroker{
     void addProducer(String topicName);
 
     void addConsumerGroup(String topicName);
+
+    Message getMessage(long offset);
 }

@@ -1,5 +1,10 @@
 
 public class KafkaBroker implements IBroker{
+
+    @Override
+    public Message getMessage(long offset){
+
+    }
     
     @Override
     public void addMessage(String topic, String payload){
