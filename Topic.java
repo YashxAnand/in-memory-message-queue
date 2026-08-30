@@ -1,19 +1,22 @@
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Topic{
     private final String topicId;
     private String topicName;
-    private CopyOnWriteArrayList<Message> messages; // Treating index as the offset of the message and assuming we retain all the messages forever.
+    private ConcurrentHashMap<Long, Message> messages; // Treating index as the offset of the message and assuming we retain all the messages forever.
+    private AtomicLong offset;
 
     public Topic(String topicName){
         this.topicId = UUID.randomUUID().toString();
         this.topicName = topicName;
-        this.messages = new CopyOnWriteArrayList<>();
+        this.messages = new ConcurrentHashMap<>();
+        this.offset = new AtomicLong(0);
     }
 
     Message getMessageAtOffset(long offset) throws OffsetNotFoundException{
         try{
-            Message message = messages.get((int)offset);
+            Message message = messages.get(Long.valueOf(offset));
 
             return message;
         }catch(Exception e){
@@ -22,6 +25,7 @@ public class Topic{
     }
 
     void addMessage(Message message){
-        messages.add(message);
+        Long key = Long.valueOf(offset.getAndIncrement());
+        messages.put(key, message);
     }
 }

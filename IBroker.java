@@ -5,4 +5,6 @@ interface IBroker{
     void addTopic(String topicName);
 
     void addConsumerGroup(String topicName);
+
+    Message getMessage(String topicName, long offset);
 }
