@@ -22,6 +22,9 @@ public class Topic{
     }
 
     Message getMessageAtOffset(long offset) throws InterruptedException{
+        if(offset < this.offset.get())
+            return messages.get(offset);
+
         lock.lock();
 
         try{
@@ -29,7 +32,7 @@ public class Topic{
                 condition.await();
             }
 
-            return messages.get(Long.valueOf(offset));
+            return messages.get(offset);
         }finally{
             lock.unlock();
         }
