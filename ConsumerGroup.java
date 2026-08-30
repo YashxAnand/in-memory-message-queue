@@ -18,14 +18,14 @@ public class ConsumerGroup{
         this.availableConsumers = new LinkedBlockingQueue();
         this.topicName = topicName;
         this.MAX_POOL_SIZE = poolSize;
-        this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
     public void addToAvailableQueue(Consumer consumer){
         availableConsumers.offer(consumer);
     }
 
-    public void pollBroker(){
+    public void startConsuming(){
+        this.executorService = Executors.newFixedThreadPool(MAX_POOL_SIZE);
 
         while(true){
             Message message = broker.getMessage(topicName, offset);
@@ -37,6 +37,8 @@ public class ConsumerGroup{
                 consumer.consume(message);
             });
         }
+
+        this.executorService.shutdown();
     }
 
     public void addNewConsumer(){
