@@ -18,30 +18,37 @@ public class ConsumerGroup{
         this.availableConsumers = new LinkedBlockingQueue();
         this.topicName = topicName;
         this.MAX_POOL_SIZE = poolSize;
-    }
 
-    public void addToAvailableQueue(Consumer consumer){
-        availableConsumers.offer(consumer);
+        for(int i = 0; i < MAX_POOL_SIZE; i++)
+            availableConsumers.offer(new Consumer());
     }
 
     public void startConsuming(){
         this.executorService = Executors.newFixedThreadPool(MAX_POOL_SIZE);
 
-        while(true){
-            Message message = broker.getMessage(topicName, offset);
-            offset++;
+        new Thread(()->{
+            try{
+                while(true){
+                    Message message = broker.getMessage(topicName, offset);
+                    offset++;
 
-            Consumer consumer = availableConsumers.take();
+                    Consumer consumer = availableConsumers.take();
 
-            executorService.submit(()->{
-                consumer.consume(message);
-            });
-        }
-
-        this.executorService.shutdown();
-    }
-
-    public void addNewConsumer(){
-        this.availableConsumers.add(new Consumer(this));
+                    executorService.submit(()->{
+                        try{
+                            consumer.consume(message);
+                        }catch(MessageConsumptionException e){
+                            System.out.println(e.getMessage());
+                        }finally{
+                            availableConsumers.offer(consumer);
+                        }
+                    });
+                }
+            }catch(InterruptedException e){
+                Thread.currentThread().interrupt();
+            }finally{
+                executorService.shutdown();
+            }
+        }).start();
     }
 }
