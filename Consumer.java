@@ -1,5 +1,4 @@
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class Consumer{
     private final String consumerId;
@@ -10,7 +9,7 @@ public class Consumer{
 
     public void consume(Message message) throws MessageConsumptionException{
         try{
-            Thread.currentThread().sleep(2, TimeUnit.SECONDS);
+            Thread.sleep(2000);
         }catch(Exception e){
             throw new MessageConsumptionException(String.format("Consumer %s failed while trying to consume message with ID: %s\n", consumerId, message.getId()));
         }
