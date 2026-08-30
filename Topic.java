@@ -25,7 +25,7 @@ public class Topic{
         lock.lock();
 
         try{
-            while(offset > this.offset.get()){
+            while(offset >= this.offset.get()){
                 condition.await();
             }
 
